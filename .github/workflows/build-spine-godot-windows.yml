@@ -1,0 +1,31 @@
+name: Build spine-godot GDExtension (Windows only, Godot 4.5.1, Spine 4.2)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: "4.2"
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps-4
+
+      - name: Build GDExtension
+        shell: bash
+        run: |
+          cd spine-godot/build
+          ./setup-extension.sh 4.5.1-stable false
+          ./build-extension.sh windows
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: spine-godot-extension-windows-godot4.5.1-spine4.2
+          path: |
+            spine-godot/example-v4-extension/bin/spine_godot_extension.gdextension
+            spine-godot/example-v4-extension/bin/windows/*.dll
